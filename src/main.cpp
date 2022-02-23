@@ -1,27 +1,29 @@
 #include <Arduino.h>
+// #include <PID_v1.h>
 
 #include "maker_pi_pins.h"
+#include "pio_rotary_encoder.h"
 
-boolean Direction_right = true;
-volatile long right_wheel_pulse_count = 0;
-
-float ang_vel = 0;
  
-int interval = 1000;
+// Initialize static member of class Rotary_encoder
+int RotaryEncoder::rotation = 0;
+RotaryEncoder my_encoder(16);
+
 long previousMillis = 0;
 long currentMillis = 0;
+int interval = 100;
 
-float tics_per_rotation = 100.0;
+bool pin_state = 0;
 
-void right_wheel_pulse();
-  
+int last_rotation;
+
 void setup() {
-  Serial.begin(9600); 
- 
-  // Set pin states of the encoder
-  pinMode(maker_pi::pins::GROOVE_1_A, INPUT);
-  pinMode(maker_pi::pins::GROOVE_1_B, INPUT);
-  attachInterrupt(digitalPinToInterrupt(maker_pi::pins::GROOVE_1_A), right_wheel_pulse, RISING);
+  Serial.begin(115200); 
+  
+  my_encoder.set_rotation(0);
+
+  pinMode(28, OUTPUT);
+  digitalWrite(28, HIGH);
    
 }
  
@@ -31,31 +33,20 @@ void loop() {
   if (currentMillis - previousMillis > interval) {
  
     previousMillis = currentMillis;
- 
-    ang_vel = float(right_wheel_pulse_count) / tics_per_rotation;
-     
-    Serial.print("Angular velocity: ");
-    Serial.println(ang_vel);
- 
-    right_wheel_pulse_count = 0;
-   
-  }
-}
 
-void right_wheel_pulse() {
-  int val = digitalRead(maker_pi::pins::GROOVE_1_B);
- 
-  if(val == LOW) {
-    Direction_right = false; // Reverse
-  }
-  else {
-    Direction_right = true; // Forward
-  }
+    int current_rotation = my_encoder.get_rotation();
+     
+    printf("Angular velocity: %d\n", last_rotation - current_rotation);
+
+    last_rotation = current_rotation;
+
+    digitalWrite(28, pin_state);
+    if (pin_state) {
+      pin_state = false;
+    }
+    else {
+      pin_state = true;
+    }
    
-  if (Direction_right) {
-    right_wheel_pulse_count++;
-  }
-  else {
-    right_wheel_pulse_count--;
   }
 }

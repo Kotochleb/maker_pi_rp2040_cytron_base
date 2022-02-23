@@ -22,6 +22,7 @@ namespace maker_pi {
         // misc
         static const unsigned int BUZZER = 11;
         static const unsigned int RGB_DIODE = 22;
+        static const unsigned int BATTER_ADC = 29;
 
         // groove
         static const unsigned int GROOVE_1_A = 0;

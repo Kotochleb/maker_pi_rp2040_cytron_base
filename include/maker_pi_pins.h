@@ -41,6 +41,7 @@ namespace maker_pi {
         static const unsigned int GROOVE_7_B = 28;
 
     } // namespace pins    
+    static const int MAX_PWM = 65535;
 } // namespace maker_pi    
 
 #endif //__MAKER_PI_PINOUT__
